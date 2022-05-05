@@ -1,0 +1,15 @@
+[package]
+name = "sophy_bot"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+poise = "0.1.0"
+figment = { version = "0.10.6", features = ["toml", "env"] }
+serde = { version = "1.0.136", features = ["derive"] }
+tokio = { version = "1.18.0", features = ["macros", "rt-multi-thread"] }
+log = "0.4.17"
+env_logger = "0.9.0"
+chrono = "0.4.19"
