@@ -1,17 +1,22 @@
+mod commands;
+mod error;
+
 use std::sync::Arc;
 
 use poise::{
     builtins::create_application_commands,
     serenity_prelude::{self, GatewayIntents, GuildId},
-    Context, Framework, FrameworkBuilder, FrameworkError, FrameworkOptions,
+    Context, Framework, FrameworkBuilder, FrameworkOptions,
 };
 
 use crate::{
-    commands::{get_commands, CommandState},
+    bot::commands::{get_commands, CommandState},
     config::Config,
     error::{AppError, MapError},
     state::State,
 };
+
+use self::error::on_error;
 
 pub struct Bot {
     client: FrameworkBuilder<State, AppError>,
@@ -64,12 +69,11 @@ pub async fn user_data_setup<'a>(
 pub async fn command_check(ctx: Context<'_, State, AppError>) -> Result<bool, AppError> {
     ctx.set_invocation_data(CommandState).await;
 
-    Ok(true)
-}
+    info!(
+        "{} executed command {}",
+        ctx.author().tag(),
+        ctx.command().name
+    );
 
-pub async fn on_error(error: FrameworkError<'_, State, AppError>) {
-    match error {
-        FrameworkError::CommandCheckFailed { error, ctx } => error!("{:?}", error),
-        _ => error!("{:?}", error),
-    }
+    Ok(true)
 }

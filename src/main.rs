@@ -1,6 +1,6 @@
 mod bot;
-mod commands;
 mod config;
+mod constants;
 mod error;
 mod logs;
 mod state;

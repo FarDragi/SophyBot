@@ -1,3 +1,7 @@
 {
-    "cSpell.language": "en,pt,pt-BR"
+    "cSpell.language": "en,pt,pt-BR",
+    "cSpell.words": [
+        "builtins",
+        "chrono"
+    ]
 }
