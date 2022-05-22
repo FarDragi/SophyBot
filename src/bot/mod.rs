@@ -1,22 +1,23 @@
 mod commands;
 mod error;
+mod state;
 
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc, time::Duration};
 
 use poise::{
     builtins::create_application_commands,
     serenity_prelude::{self, GatewayIntents, GuildId},
     Context, Framework, FrameworkBuilder, FrameworkOptions,
 };
+use tokio::{sync::RwLock, task};
 
 use crate::{
     bot::commands::{get_commands, CommandState},
     config::Config,
     error::{AppError, MapError},
-    state::State,
 };
 
-use self::error::on_error;
+use self::{error::on_error, state::State};
 
 pub struct Bot {
     client: FrameworkBuilder<State, AppError>,
@@ -63,7 +64,36 @@ pub async fn user_data_setup<'a>(
         .await
         .map_app_err()?;
 
-    Ok(State { config })
+    let shards = Arc::new(RwLock::new(HashMap::new()));
+
+    {
+        let shards = shards.clone();
+        let manager = framework.shard_manager();
+        task::spawn(async move {
+            let mut interval = tokio::time::interval(Duration::from_secs(60));
+            loop {
+                interval.tick().await;
+                let mut shards = shards.write().await;
+
+                let manager = manager.lock().await;
+                let runners = manager.runners.lock().await;
+
+                runners.iter().for_each(|(id, info)| {
+                    let latency = info.latency.unwrap_or(Duration::from_secs(0));
+
+                    shards.insert(id.0, latency);
+
+                    debug!("Shard latency: [{}: {:?}] {:?}", id, info.stage, latency);
+                });
+            }
+        });
+    }
+
+    Ok(State {
+        config,
+        shards,
+        ..Default::default()
+    })
 }
 
 pub async fn command_check(ctx: Context<'_, State, AppError>) -> Result<bool, AppError> {

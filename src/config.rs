@@ -4,7 +4,7 @@ use figment::{
 };
 use serde::Deserialize;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Default)]
 pub struct Config {
     pub token: String,
     pub owner_guild_id: u64,

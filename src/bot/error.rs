@@ -1,9 +1,9 @@
 use chrono::Utc;
 use poise::{serenity_prelude::Permissions, FrameworkError};
 
-use crate::{constants::embed_colors, error::AppError, state::State};
+use crate::{constants::embed_colors, error::AppError};
 
-use super::commands::CommandContext;
+use super::{commands::CommandContext, state::State};
 
 pub async fn on_error(error: FrameworkError<'_, State, AppError>) {
     match error {

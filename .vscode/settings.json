@@ -2,6 +2,7 @@
     "cSpell.language": "en,pt,pt-BR",
     "cSpell.words": [
         "builtins",
-        "chrono"
+        "chrono",
+        "tokio"
     ]
 }
