@@ -4,10 +4,18 @@ use figment::{
 };
 use serde::Deserialize;
 
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Debug)]
 pub struct Config {
     pub token: String,
     pub owner_guild_id: u64,
+    pub redis: RedisConfig,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct RedisConfig {
+    pub host: String,
+    pub port: Option<u16>,
+    pub slot: Option<u16>,
 }
 
 impl Config {

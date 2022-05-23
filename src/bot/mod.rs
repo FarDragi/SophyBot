@@ -1,5 +1,6 @@
 mod commands;
 mod error;
+mod handler;
 mod state;
 
 use std::{collections::HashMap, sync::Arc, time::Duration};
@@ -13,11 +14,12 @@ use tokio::{sync::RwLock, task};
 
 use crate::{
     bot::commands::{get_commands, CommandState},
+    cache::Cache,
     config::Config,
     error::{AppError, MapError},
 };
 
-use self::{error::on_error, state::State};
+use self::{error::on_error, handler::event_handler, state::State};
 
 pub struct Bot {
     client: FrameworkBuilder<State, AppError>,
@@ -25,16 +27,21 @@ pub struct Bot {
 
 impl Bot {
     pub fn new(config: Arc<Config>) -> Bot {
+        let intents = GatewayIntents::non_privileged();
+
         let options = FrameworkOptions {
             commands: get_commands(),
             on_error: |error| Box::pin(on_error(error)),
             command_check: Some(|ctx| Box::pin(command_check(ctx))),
+            listener: |ctx, event, framework, state| {
+                Box::pin(event_handler(ctx, event, framework, state))
+            },
             ..Default::default()
         };
 
         let client = Framework::build()
             .options(options)
-            .intents(GatewayIntents::non_privileged())
+            .intents(intents)
             .token(config.token.to_owned())
             .user_data_setup(move |ctx, ready, framework| {
                 Box::pin(user_data_setup(ctx, ready, framework, config))
@@ -89,10 +96,12 @@ pub async fn user_data_setup<'a>(
         });
     }
 
+    let cache = Cache::new(&config).await;
+
     Ok(State {
         config,
         shards,
-        ..Default::default()
+        cache,
     })
 }
 

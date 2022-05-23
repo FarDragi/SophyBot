@@ -3,6 +3,7 @@
     "cSpell.words": [
         "builtins",
         "chrono",
+        "deadpool",
         "tokio"
     ]
 }

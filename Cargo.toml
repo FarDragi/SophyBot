@@ -13,3 +13,5 @@ tokio = { version = "1.18.2", features = ["macros", "rt-multi-thread", "sync"] }
 log = "0.4.17"
 env_logger = "0.9.0"
 chrono = "0.4.19"
+redis = { version = "0.21.5", features = ["tokio-comp"] }
+deadpool-redis = "0.10.2"
