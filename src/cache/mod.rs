@@ -1,4 +1,6 @@
-use std::fmt::Debug;
+pub mod user;
+
+use std::{fmt::Debug, time::Duration};
 
 use deadpool_redis::{Config as PoolConfig, Connection, Pool, Runtime};
 use redis::AsyncCommands;
@@ -40,10 +42,12 @@ impl Cache {
         self.pool.get().await.map_err(AppError::Pool)
     }
 
-    pub async fn set(&self, key: &str, value: &str) -> Result<(), AppError> {
+    pub async fn set(&self, key: &str, value: &str, duration: Duration) -> Result<(), AppError> {
         let mut conn = self.get_connection().await?;
 
-        conn.set(key, value).await.map_app_err()?;
+        conn.set_ex(key, value, duration.as_secs() as usize)
+            .await
+            .map_app_err()?;
 
         Ok(())
     }
