@@ -12,7 +12,8 @@
 				"files.watcherExclude": {
 					"**/target/**": true
 				},
-				"rust-analyzer.checkOnSave.command": "clippy"
+				"rust-analyzer.checkOnSave.command": "clippy",
+                "rust-analyzer.procMacro.attributes.enable": false
 			},
 			"extensions": [
 				"vadimcn.vscode-lldb",
