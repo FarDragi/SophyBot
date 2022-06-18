@@ -26,7 +26,7 @@ impl Config {
 
     pub fn figment() -> Figment {
         Figment::new()
-            .merge(Env::prefixed("SOPHY_"))
+            .merge(Env::prefixed("SOPHY_").split("_"))
             .merge(Toml::file("Sophy.toml"))
     }
 }
