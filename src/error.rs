@@ -1,5 +1,6 @@
 use std::fmt::{Display, Formatter};
 
+use deadpool_redis::PoolError;
 use poise::serenity_prelude::Error as SerenityError;
 use redis::RedisError;
 
@@ -7,6 +8,7 @@ use redis::RedisError;
 pub enum AppError {
     Serenity(SerenityError),
     Redis(RedisError),
+    Pool(PoolError),
     Custom(&'static str),
     None,
 }

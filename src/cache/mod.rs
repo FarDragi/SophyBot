@@ -1,4 +1,6 @@
-use std::fmt::Debug;
+pub mod user;
+
+use std::{fmt::Debug, time::Duration};
 
 use deadpool_redis::{Config as PoolConfig, Connection, Pool, Runtime};
 use redis::AsyncCommands;
@@ -27,25 +29,32 @@ impl Cache {
             config.redis.slot.unwrap_or(0)
         );
 
-        let pool = PoolConfig::from_url(url)
+        let pool = PoolConfig::from_url(&url)
             .create_pool(Some(Runtime::Tokio1))
             .expect("Failed to create redis pool");
+
+        info!("Connected to redis: {}", &url);
 
         Cache { pool }
     }
 
-    async fn get_connection(&self) -> Connection {
-        self.pool
-            .get()
-            .await
-            .expect("Failed to get redis connection")
+    async fn get_connection(&self) -> Result<Connection, AppError> {
+        self.pool.get().await.map_err(AppError::Pool)
     }
 
-    pub async fn set(&self, key: &str, value: &str) -> Result<(), AppError> {
-        let mut conn = self.get_connection().await;
+    pub async fn set(&self, key: &str, value: &str, duration: Duration) -> Result<(), AppError> {
+        let mut conn = self.get_connection().await?;
 
-        conn.set(key, value).await.map_app_err()?;
+        conn.set_ex(key, value, duration.as_secs() as usize)
+            .await
+            .map_app_err()?;
 
         Ok(())
+    }
+
+    pub async fn get(&self, key: &str) -> Result<Option<String>, AppError> {
+        let mut conn = self.get_connection().await?;
+
+        conn.get(key).await.map_app_err()
     }
 }
