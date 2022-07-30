@@ -14,15 +14,12 @@ pub async fn event_handler(
     _framework: FrameworkContext<'_, State, AppError>,
     state: &State,
 ) -> Result<(), AppError> {
-    match event {
-        Event::Message { new_message } => {
-            let user = &new_message.author;
+    if let Event::Message { new_message } = event {
+        let user = &new_message.author;
 
-            if let Some(guild) = new_message.guild(ctx) {
-                add_xp(user, &guild, state).await?;
-            }
+        if let Some(guild) = new_message.guild(ctx) {
+            add_xp(ctx, new_message, user, &guild, state).await?;
         }
-        _ => {}
     }
     Ok(())
 }

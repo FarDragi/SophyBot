@@ -1,12 +1,24 @@
-use chrono::Utc;
-use poise::serenity_prelude::{Guild, User};
+use poise::serenity_prelude::{Context, Guild, Message, User};
 
-use crate::{bot::state::State, cache::user::UserCache, error::AppError};
+use crate::{
+    bot::state::State,
+    error::{AppError, MapError},
+    service::xp::XpService,
+};
 
-pub async fn add_xp(user: &User, guild: &Guild, state: &State) -> Result<(), AppError> {
-    let now = Utc::now().timestamp();
+pub async fn add_xp(
+    ctx: &Context,
+    message: &Message,
+    user: &User,
+    guild: &Guild,
+    state: &State,
+) -> Result<(), AppError> {
+    let result = state.service.add_xp(guild.id, user.id).await?;
 
-    let last_update = state.cache.get_user_last_message(user.id.0).await;
+    if let Some(level) = result.guild {
+        let text = format!("Level up to {}", level);
+        message.reply(ctx, text).await.map_app_err()?;
+    }
 
     Ok(())
 }

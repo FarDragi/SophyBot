@@ -17,6 +17,7 @@ use crate::{
     cache::Cache,
     config::Config,
     error::{AppError, MapError},
+    service::Service,
 };
 
 use self::{error::on_error, handler::event_handler, state::State};
@@ -96,12 +97,14 @@ pub async fn user_data_setup<'a>(
         });
     }
 
-    let cache = Cache::new(&config).await;
+    let cache = Cache::new(config.clone()).await;
+    let service = Arc::new(Service::new(config.clone()).await?);
 
     Ok(State {
         config,
         shards,
         cache,
+        service,
     })
 }
 

@@ -3,6 +3,7 @@ use std::fmt::{Display, Formatter};
 use deadpool_redis::PoolError;
 use poise::serenity_prelude::Error as SerenityError;
 use redis::RedisError;
+use tonic::transport::Error as TonicError;
 
 #[derive(Debug)]
 pub enum AppError {
@@ -10,6 +11,7 @@ pub enum AppError {
     Redis(RedisError),
     Pool(PoolError),
     Custom(&'static str),
+    Grpc(TonicError),
     None,
 }
 
@@ -44,6 +46,16 @@ impl<T> MapError<T> for Result<T, RedisError> {
     }
 }
 
+impl<T> MapError<T> for Result<T, PoolError> {
+    fn map_app_err(self) -> Result<T, AppError> {
+        self.map_err(AppError::Pool)
+    }
+
+    fn custom_error(self, message: &'static str) -> Result<T, AppError> {
+        self.map_err(|_| AppError::Custom(message))
+    }
+}
+
 impl<T> MapError<T> for Option<T> {
     fn map_app_err(self) -> Result<T, AppError> {
         self.ok_or(AppError::None)
@@ -51,5 +63,15 @@ impl<T> MapError<T> for Option<T> {
 
     fn custom_error(self, message: &'static str) -> Result<T, AppError> {
         self.ok_or(AppError::Custom(message))
+    }
+}
+
+impl<T> MapError<T> for Result<T, TonicError> {
+    fn map_app_err(self) -> Result<T, AppError> {
+        self.map_err(AppError::Grpc)
+    }
+
+    fn custom_error(self, message: &'static str) -> Result<T, AppError> {
+        self.map_err(|_| AppError::Custom(message))
     }
 }

@@ -4,6 +4,8 @@ mod config;
 mod constants;
 mod error;
 mod logs;
+mod models;
+mod service;
 
 use std::sync::Arc;
 
@@ -19,7 +21,7 @@ extern crate async_trait;
 
 #[tokio::main]
 async fn main() {
-    Logs::new();
+    Logs::init();
     let config = Arc::new(Config::new());
 
     let bot = Bot::new(config);

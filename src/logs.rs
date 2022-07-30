@@ -9,7 +9,7 @@ use log::{Level, LevelFilter};
 pub struct Logs;
 
 impl Logs {
-    pub fn new() {
+    pub fn init() {
         builder()
             .default_format()
             .format(|buf, record| {

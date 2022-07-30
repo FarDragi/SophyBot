@@ -1,6 +1,4 @@
-pub mod user;
-
-use std::{fmt::Debug, time::Duration};
+use std::{fmt::Debug, sync::Arc, time::Duration};
 
 use deadpool_redis::{Config as PoolConfig, Connection, Pool, Runtime};
 use redis::AsyncCommands;
@@ -21,7 +19,7 @@ impl Debug for Cache {
 }
 
 impl Cache {
-    pub async fn new(config: &Config) -> Cache {
+    pub async fn new(config: Arc<Config>) -> Cache {
         let url = format!(
             "redis://{}:{}/{}",
             config.redis.host,

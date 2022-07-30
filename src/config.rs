@@ -9,6 +9,7 @@ pub struct Config {
     pub token: String,
     pub owner_guild_id: u64,
     pub redis: RedisConfig,
+    pub service: ServiceConfig,
 }
 
 #[derive(Deserialize, Debug)]
@@ -16,6 +17,11 @@ pub struct RedisConfig {
     pub host: String,
     pub port: Option<u16>,
     pub slot: Option<u16>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ServiceConfig {
+    pub url: Option<String>,
 }
 
 impl Config {
