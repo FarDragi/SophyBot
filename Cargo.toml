@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-poise = "0.2.2"
+poise = "0.3.0"
 figment = { version = "0.10.6", features = ["toml", "env"] }
 serde = { version = "1.0.137", features = ["derive"] }
 tokio = { version = "1.19.2", features = ["macros", "rt-multi-thread", "sync"] }
@@ -16,8 +16,8 @@ chrono = "0.4.19"
 redis = { version = "0.21.5", features = ["tokio-comp"] }
 deadpool-redis = "0.10.2"
 async-trait = "0.1.56"
-tonic = "0.7.2"
-prost = "0.10.4"
+tonic = "0.8.0"
+prost = "0.11.0"
 
 [build-dependencies]
-tonic-build = "0.7.2"
+tonic-build = "0.8.0"

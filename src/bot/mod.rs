@@ -40,7 +40,7 @@ impl Bot {
             ..Default::default()
         };
 
-        let client = Framework::build()
+        let client = Framework::builder()
             .options(options)
             .intents(intents)
             .token(config.token.to_owned())
@@ -76,7 +76,7 @@ pub async fn user_data_setup<'a>(
 
     {
         let shards = shards.clone();
-        let manager = framework.shard_manager();
+        let manager = framework.shard_manager().clone();
         task::spawn(async move {
             let mut interval = tokio::time::interval(Duration::from_secs(60));
             loop {
